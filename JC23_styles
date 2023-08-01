@@ -1,0 +1,224 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/Observer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/user/repo@version/file"></script>
+
+<script>
+  // Velocity Marquee initialization
+  function initVelocityMarquee() {
+    let object = {
+      value: 1
+    };
+
+    let tl = gsap.timeline({
+      repeat: -1,
+      onReverseComplete: () => {
+        tl.progress(1);
+      }
+    });
+    tl.fromTo(
+      ".marquee_track",
+      {
+        xPercent: 0
+      },
+      {
+        xPercent: -50,
+        duration: 120,
+        ease: "none"
+      }
+    );
+
+    Observer.create({
+      target: window,
+      type: "wheel,scroll,touch",
+      onChangeY: (self) => {
+        let v = self.velocityY * 0.006;
+        v = gsap.utils.clamp(-60, 60, v);
+        tl.timeScale(v);
+        let resting = 1;
+        if (v < 0) {
+          resting = -1;
+        }
+        gsap.fromTo(
+          object,
+          { value: v },
+          {
+            value: resting,
+            duration: 1,
+            onUpdate: () => {
+              tl.timeScale(object.value);
+            }
+          }
+        );
+      }
+    });
+
+    return tl;
+  }
+
+  // Reset Velocity Marquee
+  function resetVelocityMarquee(tl) {
+    tl.restart();
+  }
+
+  // Reset Webflow components
+  function resetWebflow() {
+    window.Webflow && window.Webflow.destroy();
+    window.Webflow && window.Webflow.ready();
+    window.Webflow && window.Webflow.require("ix2").init();
+  }
+
+  // Reset Velocity Marquee and Webflow components
+  function resetMarqueeAndWebflowComponents(data, tl) {
+    resetVelocityMarquee(tl);
+    resetWebflow();
+    let parser = new DOMParser();
+    let dom = parser.parseFromString(data.next.html, "text/html");
+    let webflowPageId = $(dom).find("html").attr("data-wf-page");
+    $("html").attr("data-wf-page", webflowPageId);
+  }
+
+  // Initialize Velocity Marquee
+  let tl = initVelocityMarquee();
+
+
+</script>
+
+<!-- CMS HOVER -->
+
+<script>
+// CMS LIST SYNC POWER-UP
+window.addEventListener("DOMContentLoaded", (event) => {
+  // attribute value checker
+  function attr(defaultVal, attrVal) {
+    const defaultValType = typeof defaultVal;
+    if (typeof attrVal !== "string" || attrVal.trim() === "") return defaultVal;
+    if (attrVal === "true" && defaultValType === "boolean") return true;
+    if (attrVal === "false" && defaultValType === "boolean") return false;
+    if (isNaN(attrVal) && defaultValType === "string") return attrVal;
+    if (!isNaN(attrVal) && defaultValType === "number") return +attrVal;
+    return defaultVal;
+  }
+  // cms list sync component
+  $("[tr-listsync-element='component']").each(function (index) {
+    let componentEl = $(this),
+      cmsListEl = componentEl.find("[tr-listsync-element='list']"),
+      cmsItemEl = cmsListEl.children();
+    let onLoadSetting = attr(false, componentEl.attr("tr-listsync-onload")),
+      activeIndexSetting = attr(0, componentEl.attr("tr-listsync-activeindex")),
+      activeClassSetting = attr("is-active", componentEl.attr("tr-listsync-activeclass"));
+    function addActive(trigger) {
+      cmsItemEl.removeClass(activeClassSetting);
+      let itemIndex = trigger.index();
+      cmsListEl.each(function () {
+        $(this).children().eq(itemIndex).addClass(activeClassSetting);
+      });
+    }
+    if (onLoadSetting) addActive(cmsItemEl.eq(activeIndexSetting));
+    cmsListEl.each(function () {
+      let childrenItemEl = $(this).children(),
+        clickSetting = attr(true, $(this).attr("tr-listsync-click")),
+        hoverInSetting = attr(false, $(this).attr("tr-listsync-hoverin")),
+        hoverOutSetting = attr(false, $(this).attr("tr-listsync-hoverout"));
+      if (clickSetting) {
+        childrenItemEl.on("click", function () {
+          addActive($(this));
+        });
+      }
+      if (hoverInSetting) {
+        childrenItemEl.on("mouseenter", function () {
+          addActive($(this));
+        });
+      }
+      if (hoverOutSetting) {
+        childrenItemEl.on("mouseleave", function () {
+          cmsItemEl.removeClass(activeClassSetting);
+        });
+      }
+    });
+  });
+});
+</script>
+
+
+
+
+
+<script>
+$(".work_link").each(function (index) {
+  let listOne = $(this).find(".work_title.is-1 .char");
+  let listTwo = $(this).find(".work_title.is-2 .char");
+  // Timeline
+  let tl = gsap.timeline({ paused: true });
+  tl.to(listOne, {
+    translateY: "-0.2em",
+    rotationY: "-5.7deg",
+    rotationX: "-90deg",
+    stagger: { each: 0.08 },
+    ease: "power3.inOut",
+    duration: 0.7
+  });
+  tl.from(
+    listTwo,
+    {
+      translateY: "0.2em",
+      rotationY: "5.7deg",
+      rotationX: "90deg",
+      stagger: { each: 0.08 },
+      ease: "power3.inOut",
+      duration: 0.7
+    },
+    0.1
+  );
+  $(this).on("mouseenter", function () {
+    tl.restart();
+  });
+  $(this).on("mouseleave", function () {
+    tl.reverse();
+  });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+ document.querySelectorAll('.marquee_item').forEach(trigger => {
+  trigger.addEventListener('mouseover', function(){ 
+    document.querySelectorAll('.home-title').forEach(target => target.classList.add('is-active'));
+    document.querySelectorAll('.home-subtitle').forEach(target => target.classList.add('is-active')); 
+  });
+ }); 
+ 
+ document.querySelectorAll('.marquee_item').forEach(trigger => {
+  trigger.addEventListener('mouseout', function(){ 
+    document.querySelectorAll('.home-title').forEach(target => target.classList.remove('is-active'));
+    document.querySelectorAll('.home-subtitle').forEach(target => target.classList.remove('is-active')); 
+  });
+ }); 
+});
+</script>
+
+<!-- Your existing HTML code -->
+
+<!-- Add Barba.js and its required dependencies -->
+<script src="https://unpkg.com/@barba/core@2.9.8/dist/barba.umd.js"></script>
+
+<!-- Add the Barba.js script to handle page transitions -->
+<script>
+  // Initialize Barba.js
+  Barba.init({
+    transitions: [{
+      async leave() {
+        // Reset the Velocity Marquee and Webflow components on page transition
+        resetMarqueeAndWebflowComponents();
+        await new Promise(resolve => tl.eventCallback('onReverseComplete', resolve));
+      },
+    }],
+  });
+
+  // Implement the page transition event
+  Barba.Dispatcher.on('newPageReady', (currentStatus, oldStatus, container) => {
+    // Reinitialize the Velocity Marquee after the new page is loaded
+    tl = initVelocityMarquee();
+  });
+</script>
